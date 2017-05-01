@@ -1,0 +1,7 @@
+name: "gallery"
+output_dir: "."
+navbar:
+  title: "Audiracmichelle's Gallery"
+  left:
+    - text: "Home"
+      href: index.html
