@@ -5,4 +5,4 @@ date: "4/30/2017"
 ---
 A landing place for Michelle's Audirac collection of R Markdown documents.
 
-[CAPM Intuitive Interpretation](test.html)
+[Beta Interpretation](BetaInterpretation.html)
