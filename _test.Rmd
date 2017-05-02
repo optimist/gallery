@@ -33,11 +33,6 @@ price <- get_prices_yahoo(yahoo_id, "2010-01-01")
 
 ```
 
-```{r, fig.width = 7}
-plotly_xts(price)
-```
-
-
 We will now take the theory shared and prove the results using code and data. In this example we will use financial time series. 
 
 First, let's load required packages. To do this we will use functions `load.packages` and `strspl` functions from `metodosMultivariados2017` package.

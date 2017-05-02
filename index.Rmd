@@ -3,6 +3,7 @@ title: "About"
 author: "Michelle Audirac"
 date: "4/30/2017"
 ---
-A landing place for Michelle's Audirac collection of R Markdown documents.
+A landing place for Michelle Audirac's collection of R Markdown documents.
 
 [Beta Interpretation](BetaInterpretation.html)
+[CAPM Example](CapmExample.html)

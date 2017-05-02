@@ -8,10 +8,10 @@ I decided to create a post where I could share a simple and intuitive interpreta
 
 Although readers must be familiar with a good amount of 'mathematical jargon', enthusiastic readers should not get discouraged. This material is intended to be a complement to traditional 'linear regression' literature. 
 
-Finance professionals whose careers are related to Asset Management understand the relevance of $\hat\beta$ provided the common use of CAPM in the field. This is why my post 'CAPM example' is specially addressed to portfolio analytics users. In the 'CAPM example' post, theory is put into practice and the results that are shown here are proven using code and data.
+<!--Finance professionals whose careers are related to Asset Management understand the relevance of $\hat\beta$ provided the common use of CAPM in the field. This is why my post 'CAPM example' is specially addressed to portfolio analytics users. In the 'CAPM example' post, theory is put into practice and the results that are shown here are proven using code and data.-->
 
 ##An Intuitive Interpretation of $\hat\beta$
-The starting point is: $\hat\beta = (X^TX)^{-1}X^TY$...what is $(X^TX)^{-1}X^TY$?
+Let's start by remembering that $\hat\beta = (X^TX)^{-1}X^TY$ is the OLS (ordinary least squares) estimator for $\beta$ and that it also happens to be its MLE (maximum likelihood estimator). We won't delve into the OLS or the maximum likelihood formulations for regression, what we will do is try to understand what is $(X^TX)^{-1}X^TY$.
 
 Assuming $X_i$ and $X_j$ are $n$-dimensional vectors with mean 0 we can compute the empirical Covariance between $X_i$ and $X_j$ using $\mathrm{\hat{Cov}}(X_i, X_j)=\big(\frac{1}{n}\big)X_i^TX_j$. Let's denote with $\hat\Sigma$ the empirical Covariance Matrix of $X = (X_1| X_2|\dots|X_p)$. It follows that
 
