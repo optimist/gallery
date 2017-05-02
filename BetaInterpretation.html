@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Michelle Audirac" />
+
+<meta name="date" content="2017-05-01" />
+
+<title>An Intuitive Interpretation of Beta</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-1.1/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Audiracmichelle's Gallery</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">An Intuitive Interpretation of Beta</h1>
+<h4 class="author"><em>Michelle Audirac</em></h4>
+<h4 class="date"><em>2017-05-01</em></h4>
+
+</div>
+
+
+<p>I decided to create a post where I could share a simple and intuitive interpretation of the coefficients of a linear regression. I came to this conclusion, simply because I was surprised of NOT finding any document that explores the expression <span class="math inline">\(\hat\beta = (X^TX)^{-1}X^TY\)</span> as I will do in the present work.</p>
+<p>Although readers must be familiar with a good amount of ‘mathematical jargon’, enthusiastic readers should not get discouraged. This material is intended to be a complement to traditional ‘linear regression’ literature.</p>
+<p>Finance professionals whose careers are related to Asset Management understand the relevance of <span class="math inline">\(\hat\beta\)</span> provided the common use of CAPM in the field. This is why my post ‘CAPM example’ is specially addressed to portfolio analytics users. In the ‘CAPM example’ post, theory is put into practice and the results that are shown here are proven using code and data.</p>
+<div id="an-intuitive-interpretation-of-hatbeta" class="section level2">
+<h2>An Intuitive Interpretation of <span class="math inline">\(\hat\beta\)</span></h2>
+<p>The starting point is: <span class="math inline">\(\hat\beta = (X^TX)^{-1}X^TY\)</span>…what is <span class="math inline">\((X^TX)^{-1}X^TY\)</span>?</p>
+<p>Assuming <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_j\)</span> are <span class="math inline">\(n\)</span>-dimensional vectors with mean 0 we can compute the empirical Covariance between <span class="math inline">\(X_i\)</span> and <span class="math inline">\(X_j\)</span> using <span class="math inline">\(\mathrm{\hat{Cov}}(X_i, X_j)=\big(\frac{1}{n}\big)X_i^TX_j\)</span>. Let’s denote with <span class="math inline">\(\hat\Sigma\)</span> the empirical Covariance Matrix of <span class="math inline">\(X = (X_1| X_2|\dots|X_p)\)</span>. It follows that</p>
+<span class="math display">\[\begin{equation}
+\hat\Sigma
+
+= \Big(\frac{1}{n}\Big) X^TX 
+
+= \Big(\frac{1}{n}\Big) \begin{pmatrix}
+X_1^TX_1 &amp; X_1^TX_2 &amp; \ldots &amp;X_1^TX_p \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+X_p^TX_1 &amp; X_p^TX_2 &amp; \ldots &amp;X_p^TX_p
+\end{pmatrix}
+
+\end{equation}\]</span>
+Using this simple fact, it is possible to rewrite <span class="math inline">\(\hat\beta\)</span> using only statistical terms.
+<span class="math display">\[\begin{equation}
+\hat\beta=(X^TX)^{-1}X^TY
+
+= \frac{1}{n}\hat\Sigma^{-1} X^TY
+
+= \frac{1}{n}\hat\Sigma^{-1} \begin{pmatrix}
+X_1^TY\\
+X_2^TY\\
+\vdots\\
+X_p^TY
+\end{pmatrix}
+
+= \hat\Sigma^{-1} \begin{pmatrix}
+\mathrm{\hat{Cov}}(X_1, Y)\\
+\mathrm{\hat{Cov}}(X_2, Y)\\
+\vdots\\
+\mathrm{\hat{Cov}}(X_p, Y)\\
+\end{pmatrix}
+
+= \hat\Sigma^{-1}\mathrm{\hat{Cov}}(X, Y)
+
+\end{equation}\]</span>
+<p>As we can see, each <span class="math inline">\(\hat\beta_i\)</span> is a linear combination of the empirical Covariances between the <span class="math inline">\(X_i\)</span>’s and <span class="math inline">\(Y\)</span>, weighted by elements of <span class="math inline">\(\hat\Sigma^{-1}\)</span>.</p>
+<p>The beauty of the relationship between <span class="math inline">\(\hat\beta\)</span> and <span class="math inline">\(\hat\Sigma^{-1}\)</span> builds upon the properties of <span class="math inline">\(\hat\Sigma^{-1}\)</span>. While the Covariance or Dispersion Matrix is pretty acclaimed, its fraternal inverse, the Precision or Concetration Matrix, is not as well known.</p>
+<p>Clearly, the diagonal elements of <span class="math inline">\(\hat\Sigma\)</span> measure how the <span class="math inline">\(X_i\)</span>’s disperse around their mean and the off-diagonal elements reflect how the <span class="math inline">\(X_i\)</span>’s co-vary linearly with each other. Similarly, <span class="math inline">\(\hat\Sigma^{-1}\)</span>’s diagonal elements measure how the <span class="math inline">\(X_i\)</span>’s concentrate around their mean. On the other hand, it is not exactly true that the off-diagonal elements of <span class="math inline">\(\Sigma^{-1}\)</span> reflect the extent to which the the <span class="math inline">\(X_i&#39;s\)</span> do not co-vary with each other.</p>
+<p>Let’s think of what would happen if we added or deleted <span class="math inline">\(X_i\)</span>’s from our observation universe. If we take out an <span class="math inline">\(X_i\)</span> from our observation set, <span class="math inline">\(\hat\Sigma\)</span> is exactly the same as it was except that the <span class="math inline">\(i\)</span>th column and row are dropped. In contrast, all the elements of <span class="math inline">\(\hat\Sigma^{-1}\)</span> change when an <span class="math inline">\(X_i\)</span> is added or deleted from the observation set. This is because <span class="math inline">\(\hat\Sigma^{-1}\)</span> behaves truly in a multivariate fashion rather than in a bivariate fashion, as does <span class="math inline">\(\hat\Sigma\)</span> itself.</p>
+<p>Let’s continue finding out how <span class="math inline">\(\hat\beta\)</span> relates with Precision Matrix. First we will assume that the <span class="math inline">\(X_i\)</span>’s are not correlated, that is, that <span class="math inline">\(\hat\Sigma\)</span> is a diagonal matrix. In this particular case, it is straight forward that <span class="math inline">\(\hat\Sigma^{-1}\)</span> is also a diagonal matrix whose diagonal elements are the empirical precision of the <span class="math inline">\(X_i\)</span>’s. Therefore, it is easy to see that when there is no correlation between the <span class="math inline">\(X_i\)</span>’s, each <span class="math inline">\(\hat\beta_i\)</span> is exactly <strong>the Covariance between <span class="math inline">\(X_i\)</span> and <span class="math inline">\(Y\)</span> weighted by the precision of <span class="math inline">\(X_i\)</span></strong>.</p>
+<p>We will arrive to very similar conclusions for the case where <span class="math inline">\(X_i\)</span>’s do co-vary with each other. To do this, we will use the eigendecomposition of <span class="math inline">\(\hat\Sigma\)</span>.</p>
+</div>
+<div id="the-transformed-hatbeta" class="section level2">
+<h2>The transformed <span class="math inline">\(\hat\beta\)</span></h2>
+Provided <span class="math inline">\(PDP^T\)</span>, the eigendecomposition of <span class="math inline">\(\hat\Sigma\)</span>, we know that <span class="math inline">\(P\)</span>’s colums are the eigenvectors <span class="math inline">\(P_1, P_2,\ldots, P_p\)</span> of <span class="math inline">\(\hat\Sigma\)</span> and that the diagonal of <span class="math inline">\(D\)</span> has the eigenvalues of <span class="math inline">\(\hat\Sigma\)</span>. We also know that the columns of <span class="math inline">\(XP\)</span> are a set of transformed observations <span class="math inline">\(XP_1, XP_2,\ldots, XP_p\)</span> called principal components. Since
+<span class="math display">\[\begin{equation}
+\mathrm{PDP^T}=\hat\Sigma=\frac{1}{n}X^TX
+\end{equation}\]</span>
+then
+<span class="math display">\[\begin{equation}
+D=\frac{1}{n}P^TX^TXP=\frac{1}{n}(XP)^TXP
+\end{equation}\]</span>
+<p>so that the empirical covariance matrix of the principal components is precisely <span class="math inline">\(D\)</span>. In consequence, the principal components are uncorrelated and their variances are the eigenvalues of <span class="math inline">\(\hat\Sigma\)</span>.</p>
+<p>It follows that <span class="math inline">\(\hat\Sigma^{-1}\)</span> is given by <span class="math inline">\(PD^{-1}P^T\)</span>, therefore</p>
+<span class="math display">\[\begin{align}
+\hat\beta &amp;= \hat\Sigma^{-1}\mathrm{\hat{Cov}}(X, Y) \\
+&amp;= PD^{-1}P^T\mathrm{\hat{Cov}}(X, Y) \\
+&amp;= PD^{-1}\mathrm{\hat{Cov}}(XP, Y) \\
+\end{align}\]</span>
+If we transform <span class="math inline">\(\hat\beta\)</span> using <span class="math inline">\(P^T\hat\beta\)</span> then
+<span class="math display">\[\begin{equation}
+\mathrm{P}^T\beta = \mathrm{D^{-1}}\mathrm{\hat{Cov}}(XP, Y)
+\end{equation}\]</span>
+<p>In consequence, it is very nice to see that each transformed <span class="math inline">\(\hat\beta_i\)</span>, given by <span class="math inline">\(P_i^T\hat\beta\)</span>, is exactly <strong>the Covariance between the <span class="math inline">\(i\)</span>th principal component and Y weighted by the precision of the <span class="math inline">\(i\)</span>th principal component</strong>.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

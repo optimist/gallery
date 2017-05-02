@@ -1,0 +1,161 @@
+---
+title: "Test"
+author: "Michelle Audirac"
+date: "5/1/2017"
+output: html_document
+---
+
+```{r}
+devtools::install_github("optimist/optimist@v1.1")
+library(optimist)
+```
+
+## R Markdown
+
+In this example we will get prices for ETFs that follow the S&P500 and Industry Sectors. Industry names are listed within the code below.
+```{r}
+yahoo_id <- c(
+  "SPY",
+  "IYK", #Consumer Goods
+  "IYC", #Consumer Services
+  "IYE", #Energy
+  "IYF", #Financials
+  "IYJ", #Industrials
+  "IYM", #Materials
+  "IDU", #Utilities
+  "IYH", #Health Care
+  "IYW", #Technology
+  "IYZ", #Telecomm
+  "IYR" #Real State
+)
+
+price <- get_prices_yahoo(yahoo_id, "2010-01-01")
+
+```
+
+```{r, fig.width = 7}
+plotly_xts(price)
+```
+
+
+We will now take the theory shared and prove the results using code and data. In this example we will use financial time series. 
+
+First, let's load required packages. To do this we will use functions `load.packages` and `strspl` functions from `metodosMultivariados2017` package.
+```{r, warning = FALSE, message = FALSE}
+library("metodosMultivariados2017")
+
+load.packages(strspl("RCurl, 
+lubridate, 
+xts, 
+dplyr, 
+tidyr, 
+plotly"))
+```
+
+Next we will fetch prices from `yahoo.finance.com`. To do this we will use function `get_prices_yahoo` from `metodosMultivariados2017` package.
+
+In this example we will get prices for ETFs that follow the S&P500 and Industry Sectors. Industry names are listed within the code below.
+```{r, warning = FALSE, message =  FALSE}
+yahoo_id <- c(
+"SPY",
+"IYK", #Consumer Goods
+"IYC", #Consumer Services
+"IYE", #Energy
+"IYF", #Financials
+"IYJ", #Industrials
+"IYM", #Materials
+"IDU", #Utilities
+"IYH", #Health Care
+"IYW", #Technology
+"IYZ", #Telecomm
+"IYR" #Real State
+)
+
+price <- get_prices_yahoo(yahoo_id, "2010-01-01")
+
+```
+
+From prices, let's compute the returns of the ETFs and plot their daily changes. 
+
+We use functions `get_returns` and `plot_returns` from package `metodosMultivariados2017`.
+```{r, fig.width = 7}
+returns <- get_returns(price)
+
+plot_returns(returns["2016/", ])
+```
+
+If we acumulate the daily changes, we get the cumulative returns which are plotted below. If we had invested in the S&P500 at the beginning of 2016 we would have 20% of effective return.
+```{r, fig.width = 7}
+cum_return <- get_returns(price["2016/", ], is_cumulative = TRUE)
+
+plot_returns(cum_return[, ])
+```
+
+We will now get a linear model that tries to explain the S&P500 with only two sectors. The $\beta$ is printed
+```{r}
+model = lm(SPY ~ -1 + IYK + IYC, data = returns)
+model$coefficients
+```
+
+Let's do the same for all sectors. The $\beta$ is printed as well. 
+
+We can see how the $\beta$ coefficients for `IYK` and `IYC` changed after we included more variables to the model. 
+```{r}
+model = lm(SPY ~ -1 + IYK + IYC + IYE + IYF + IYJ + IYM + IDU + IYH + IYW + IYZ + IYR, data = returns)
+model$coefficients
+
+beta <- model$coefficients
+```
+
+It is time to see what happens if we use principal components.
+
+First we have to get the loadings (eigenvectors) and eigenvalues.
+```{r, fig.width = 7}
+X <- returns[, -1]
+Y <- returns[, 1]
+
+cov_X <- cov(X, use = "pairwise.complete.obs")
+P <- eigen(cov_X)$vectors
+colnames(P) <- paste("PC", 1:ncol(P), sep = "")
+d <- eigen(cov_X)$values
+```
+
+When we plot the returns of the principal components it is interesting to see how the first principal component shows the most volatility. Evidently the last principal component shows the least volatility.
+```{r, fig.width = 7}
+pp <- X %*% P
+pp <- as.xts(pp, order.by = index(returns))
+
+plot_returns(pp["2016/", ])
+```
+
+Take a look at the $\beta$ coefficients for a linear model that uses the first two principal components to explain the S&P500.
+```{r}
+pp_returns <- data.frame(returns$SPY, pp)
+
+model = lm(SPY ~ -1 + PC1 + PC2, data = pp_returns)
+model$coefficients
+```
+
+Do the same using all the principal components so we can verify how the $\beta$ coefficients for `PC1` and `PC2` have the same values as the 'two principal component model'.
+```{r}
+model = lm(SPY ~ -1 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + PC11, data = pp_returns)
+model$coefficients
+```
+
+At this point think of the transformed $\beta$ and remember how each coefficient is the empirical covariance of each principal component with the S&P500 weigthed by the precision of each principal component.
+
+To do this, let's compute the covariance of the principal components with the S&P500.
+```{r}
+cov_ppY <- cov(pp, Y, use = "pairwise.complete.obs")
+print(cov_ppY)
+```
+
+Weight those covariances by the precision of the principal components. See how we recover the $\beta$ coefficients that were computed with function `lm`.
+```{r}
+cov_ppY/d
+```
+
+Finally, a nice result is to prove that the first principal component for the industy sectors is the market (i.e. is the S&P500). To do this, we shall compute the correlation of the first principal component with the market. See how it is almost 1?
+```{r}
+cor(pp[, 1], Y, use = "pairwise.complete.obs")
+```
