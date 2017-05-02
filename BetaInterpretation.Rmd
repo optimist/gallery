@@ -4,7 +4,7 @@ author: "Michelle Audirac"
 date: "2017-05-01"
 ---
 
-I decided to create a post where I could share a simple and intuitive interpretation of the coefficients of a linear regression. I came to this conclusion, simply because I was surprised of NOT finding any document that explores the expression $\hat\beta = (X^TX)^{-1}X^TY$ as I will do in the present work.
+I decided to create a post where I could share a simple and intuitive interpretation of the coefficients of a linear regression. I came to this decision simply because I was surprised of NOT finding any document that explores the expression $\hat\beta = (X^TX)^{-1}X^TY$ as I do in the present work.
 
 Although readers must be familiar with a good amount of 'mathematical jargon', enthusiastic readers should not get discouraged. This material is intended to be a complement to traditional 'linear regression' literature. 
 
